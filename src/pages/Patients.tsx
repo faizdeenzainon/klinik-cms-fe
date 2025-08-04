@@ -2,6 +2,7 @@ import React, { useState, useEffect  } from 'react';
 import { PatientTable } from '../components/Patients/PatientTable';
 import { PatientModal } from '../components/Patients/PatientModal';
 import { Patient } from '../types';
+import { PrescribeMedicationModal } from '../components/Patients/PrescribeMedicationModal';
 import axios from 'axios';
 
 export const Patients: React.FC = () => {
@@ -10,9 +11,11 @@ export const Patients: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [patientToEdit, setPatientToEdit] = useState<Patient | null>(null);
   const [isViewOnly, setIsViewOnly] = useState<boolean>(false);
+  const [isPrescribeModalOpen, setIsPrescribeModalOpen] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
 
   useEffect(() => {
-  axios.get<Patient[]>('https://shortcuts-bo-memo-optimization.trycloudflare.com/api/patients')
+  axios.get<Patient[]>('http://localhost:8080/api/patients')
     .then(response => {
       setPatients(response.data);
     })
@@ -47,9 +50,20 @@ export const Patients: React.FC = () => {
     // Implement delete functionality
   };
 
+  const handlePrescribeMedication = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setIsPrescribeModalOpen(true);
+  };
+
+  const handlePrescriptionSubmit = (prescriptions: any[]) => {
+    console.log('Prescriptions for', selectedPatient?.firstName, ':', prescriptions);
+    // Here you would typically update the patient's medical records
+    // and reduce inventory stock accordingly
+  };
+
   const handleAddPatient = async (newPatientData: Omit<Patient, 'id' | 'createdAt'>) => {
   try {
-    const response = await axios.post<Patient>('https://shortcuts-bo-memo-optimization.trycloudflare.com/api/patients', newPatientData);
+    const response = await axios.post<Patient>('http://localhost:8080/api/patients', newPatientData);
     setPatients(prev => [response.data, ...prev]);
   } catch (error) {
     console.error('Error adding patient:', error);
@@ -69,6 +83,7 @@ export const Patients: React.FC = () => {
         onEditPatient={handleEditPatient}
         onViewPatient={handleViewPatient}
         onDeletePatient={handleDeletePatient}
+        onPrescribeMedication={handlePrescribeMedication}
       />
 
       <PatientModal
@@ -82,6 +97,13 @@ export const Patients: React.FC = () => {
         onUpdatePatient={handleUpdatePatient}
         patientToEdit={patientToEdit || undefined}
         isViewOnly={isViewOnly}
+      />
+
+      <PrescribeMedicationModal
+        isOpen={isPrescribeModalOpen}
+        onClose={() => setIsPrescribeModalOpen(false)}
+        patient={selectedPatient}
+        onPrescribe={handlePrescriptionSubmit}
       />
     </div>
   );

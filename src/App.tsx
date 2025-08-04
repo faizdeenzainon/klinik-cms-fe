@@ -8,6 +8,7 @@ import { Patients } from './pages/Patients';
 import { Appointments } from './pages/Appointments';
 import { Doctors } from './pages/Doctors';
 import { MedicalRecords } from './pages/MedicalRecords';
+import { Inventory } from './pages/Inventory';
 import { Billing } from './pages/Billing';
 import { Settings } from './pages/Settings';
 
@@ -37,6 +38,7 @@ const AppContent: React.FC = () => {
         <Route path="/appointments" element={<Appointments />} />
         <Route path="/doctors" element={<Doctors />} />
         <Route path="/records" element={<MedicalRecords />} />
+        <Route path="/inventory" element={<Inventory />} />
         <Route path="/billing" element={<Billing />} />
         <Route path="/settings" element={<Settings />} />
       </Routes>

@@ -1,4 +1,4 @@
-import { Patient, Doctor, Appointment, MedicalRecord, DashboardStats } from '../types';
+import { Patient, Doctor, Appointment, MedicalRecord, DashboardStats, InventoryItem } from '../types';
 
 export const mockPatients: Patient[] = [
   {
@@ -172,3 +172,128 @@ export const dashboardStats: DashboardStats = {
   totalDoctors: 12,
   monthlyRevenue: 125000
 };
+
+export const mockInventoryItems: InventoryItem[] = [
+  {
+    id: '1',
+    name: 'Paracetamol 500mg',
+    category: 'medication',
+    description: 'Pain relief and fever reducer tablets',
+    currentStock: 250,
+    minStock: 50,
+    maxStock: 500,
+    unit: 'tablets',
+    unitPrice: 0.15,
+    supplier: 'PharmaCorp Ltd',
+    expiryDate: '2025-08-15',
+    batchNumber: 'PC2024-001',
+    location: 'Pharmacy - Shelf A1',
+    status: 'in-stock',
+    lastUpdated: '2024-01-15',
+    createdAt: '2023-06-01'
+  },
+  {
+    id: '2',
+    name: 'Digital Thermometer',
+    category: 'equipment',
+    description: 'Non-contact infrared thermometer',
+    currentStock: 5,
+    minStock: 3,
+    maxStock: 10,
+    unit: 'pieces',
+    unitPrice: 45.00,
+    supplier: 'MedTech Solutions',
+    location: 'Equipment Room - Cabinet B',
+    status: 'in-stock',
+    lastUpdated: '2024-01-10',
+    createdAt: '2023-03-15'
+  },
+  {
+    id: '3',
+    name: 'Disposable Syringes 5ml',
+    category: 'supplies',
+    description: 'Sterile disposable syringes with needles',
+    currentStock: 15,
+    minStock: 50,
+    maxStock: 200,
+    unit: 'pieces',
+    unitPrice: 0.75,
+    supplier: 'Medical Supplies Co',
+    expiryDate: '2026-12-31',
+    batchNumber: 'MS2024-SYR',
+    location: 'Supply Room - Drawer C3',
+    status: 'low-stock',
+    lastUpdated: '2024-01-14',
+    createdAt: '2023-09-20'
+  },
+  {
+    id: '4',
+    name: 'Surgical Gloves (Latex)',
+    category: 'consumables',
+    description: 'Sterile latex surgical gloves - Size M',
+    currentStock: 0,
+    minStock: 20,
+    maxStock: 100,
+    unit: 'boxes',
+    unitPrice: 12.50,
+    supplier: 'SafeHands Medical',
+    expiryDate: '2025-06-30',
+    batchNumber: 'SH2024-GLV',
+    location: 'Surgery Room - Cabinet A',
+    status: 'out-of-stock',
+    lastUpdated: '2024-01-12',
+    createdAt: '2023-11-05'
+  },
+  {
+    id: '5',
+    name: 'Amoxicillin 250mg',
+    category: 'medication',
+    description: 'Antibiotic capsules for bacterial infections',
+    currentStock: 80,
+    minStock: 30,
+    maxStock: 150,
+    unit: 'capsules',
+    unitPrice: 0.25,
+    supplier: 'PharmaCorp Ltd',
+    expiryDate: '2024-02-28',
+    batchNumber: 'PC2023-AMX',
+    location: 'Pharmacy - Shelf A2',
+    status: 'expired',
+    lastUpdated: '2024-01-13',
+    createdAt: '2023-05-10'
+  },
+  {
+    id: '6',
+    name: 'Blood Pressure Monitor',
+    category: 'equipment',
+    description: 'Digital automatic blood pressure monitor',
+    currentStock: 8,
+    minStock: 5,
+    maxStock: 15,
+    unit: 'pieces',
+    unitPrice: 85.00,
+    supplier: 'HealthTech Devices',
+    location: 'Consultation Room - Cabinet D',
+    status: 'in-stock',
+    lastUpdated: '2024-01-11',
+    createdAt: '2023-07-22'
+  },
+  {
+    id: '7',
+    name: 'Gauze Bandages',
+    category: 'supplies',
+    description: 'Sterile gauze bandages 4x4 inches',
+    currentStock: 120,
+    minStock: 40,
+    maxStock: 200,
+    unit: 'pieces',
+    unitPrice: 0.50,
+    supplier: 'Medical Supplies Co',
+    expiryDate: '2027-03-15',
+    batchNumber: 'MS2024-GAU',
+    location: 'Supply Room - Shelf E1',
+    status: 'in-stock',
+    lastUpdated: '2024-01-09',
+    createdAt: '2023-08-18'
+  }
+];

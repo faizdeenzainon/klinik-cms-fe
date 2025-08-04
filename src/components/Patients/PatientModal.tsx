@@ -65,6 +65,29 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
     }
   }, [patientToEdit, isOpen]);
 
+  const [isClosing, setIsClosing] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsMounted(true);
+      // Delay to trigger fade-in
+      setTimeout(() => {
+        setIsVisible(true);
+      }, 10); // small delay for transition to apply
+    } else {
+      // trigger fade-out
+      setIsVisible(false);
+      // delay unmount
+      setTimeout(() => {
+        setIsMounted(false);
+      }, 300); // match transition
+    }
+  }, [isOpen]);
+
+  const [isVisible, setIsVisible] = useState(false); // for fade animation
+  const [isMounted, setIsMounted] = useState(false); // controls mounting
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -125,11 +148,26 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
     }
   };
 
-  if (!isOpen) return null;
+  const handleClose = () => {
+    setIsVisible(false); // start fade out
+    setTimeout(() => {
+      onClose(); // trigger parent close after fade
+    }, 300);
+  };
+
+  if (!isMounted) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div
+      className={`fixed inset-0 bg-black bg-opacity-0 flex items-center justify-center p-4 z-50 transition-opacity duration-300 ${
+        isVisible ? 'opacity-100' : 'opacity-0'
+      }`}
+    >
+      <div
+        className={`bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto transform transition-all duration-300 ${
+          isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+        }`}
+      >
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-xl">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-blue-50 rounded-lg">
@@ -147,7 +185,7 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
             </div>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
           >
             <X className="h-5 w-5 text-gray-500" />
@@ -404,9 +442,10 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
 
           {/* Form Actions */}
           <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
             >
               Close
@@ -418,13 +457,18 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
                 disabled={isSubmitting}
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-2"
               >
-                {isSubmitting
-                  ? patientToEdit
-                    ? 'Updating Patient...'
-                    : 'Adding Patient...'
-                  : patientToEdit
-                  ? 'Update Patient'
-                  : 'Add Patient'}
+                {isSubmitting ? (
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                  </svg>
+                ) : (
+                  <>
+                    <span>
+                      {patientToEdit ? 'Update Patient' : 'Add Patient'}
+                    </span>
+                  </>
+                )}
               </button>
             )}
           </div>

@@ -8,22 +8,22 @@ interface DoctorGridProps {
 
 export const DoctorGrid: React.FC<DoctorGridProps> = ({ doctors }) => {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-      <div className="p-6 border-b border-gray-200">
+    <div className="container mx-auto bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="p-4 sm:p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900">Medical Staff</h3>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200">
+          <button className="bg-blue-600 text-white px-3 py-2 text-sm sm:text-base rounded-lg hover:bg-blue-700 transition-colors duration-200">
             Add Doctor
           </button>
         </div>
       </div>
       
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {doctors.map((doctor) => (
             <div key={doctor.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200">
               <div className="text-center mb-4">
-                <div className="h-16 w-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                <div className="h-12 w-12 sm:h-16 sm:w-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
                   <span className="text-white font-semibold text-lg">
                     {doctor.firstName.charAt(0)}{doctor.lastName.charAt(0)}
                   </span>

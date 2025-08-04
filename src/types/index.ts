@@ -72,3 +72,22 @@ export interface DashboardStats {
   totalDoctors: number;
   monthlyRevenue: number;
 }
+
+export interface InventoryItem {
+  id: string;
+  name: string;
+  category: 'medication' | 'equipment' | 'supplies' | 'consumables';
+  description: string;
+  currentStock: number;
+  minStock: number;
+  maxStock: number;
+  unit: string;
+  unitPrice: number;
+  supplier: string;
+  expiryDate?: string;
+  batchNumber?: string;
+  location: string;
+  status: 'in-stock' | 'low-stock' | 'out-of-stock' | 'expired';
+  lastUpdated: string;
+  createdAt: string;
+}

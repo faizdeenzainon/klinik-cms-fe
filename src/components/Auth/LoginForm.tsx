@@ -46,11 +46,11 @@ export const LoginForm: React.FC = () => {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="p-3  rounded-xl">
-              <img src="/khalifa.png" alt="Klinik Icon" className="h-15 w-15 rounded-full object-cover" />
+              <img src="/TriQon-logo.jpeg" alt="Klinik Icon" className="h-15 w-15 rounded-full object-cover" />
             </div>
             
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Klinik Khalifa Pajam</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Clinic Management System</h1>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Welcome Back</h2>
           <p className="text-gray-600">Sign in to your clinic management account</p>
         </div>
