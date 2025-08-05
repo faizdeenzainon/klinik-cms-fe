@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { X, Pill, Plus, Trash2, Search } from 'lucide-react';
 import { InventoryItem, Patient } from '../../types';
 import { mockInventoryItems } from '../../data/mockData';
@@ -26,9 +26,6 @@ export const PrescribeMedicationModal: React.FC<PrescribeMedicationModalProps> =
   patient,
   onPrescribe,
 }) => {
-  const [isMounted, setIsMounted] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([
     {
       itemId: '',
@@ -40,26 +37,10 @@ export const PrescribeMedicationModal: React.FC<PrescribeMedicationModalProps> =
       instructions: '',
     },
   ]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Fade in/out control
-  useEffect(() => {
-    if (isOpen && patient) {
-      setIsMounted(true);
-      setTimeout(() => setIsVisible(true), 10);
-    } else {
-      setIsVisible(false);
-      setTimeout(() => setIsMounted(false), 300);
-    }
-  }, [isOpen, patient]);
-
-  const handleClose = () => {
-    setIsVisible(false);
-    setTimeout(() => {
-      onClose();
-    }, 300);
-  };
-
+  // Filter medications from inventory
   const availableMedications = mockInventoryItems.filter(
     item => item.category === 'medication' && item.status === 'in-stock'
   );
@@ -89,11 +70,7 @@ export const PrescribeMedicationModal: React.FC<PrescribeMedicationModalProps> =
     }
   };
 
-  const updatePrescription = (
-    index: number,
-    field: keyof Prescription,
-    value: string | number
-  ) => {
+  const updatePrescription = (index: number, field: keyof Prescription, value: string | number) => {
     const updated = [...prescriptions];
     if (field === 'itemId') {
       const selectedItem = availableMedications.find(item => item.id === value);
@@ -110,7 +87,8 @@ export const PrescribeMedicationModal: React.FC<PrescribeMedicationModalProps> =
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
+    // Validate prescriptions
     const validPrescriptions = prescriptions.filter(
       p => p.itemId && p.dosage && p.frequency && p.duration && p.quantity > 0
     );
@@ -121,9 +99,13 @@ export const PrescribeMedicationModal: React.FC<PrescribeMedicationModalProps> =
     }
 
     setIsSubmitting(true);
+    
+    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
-
+    
     onPrescribe(validPrescriptions);
+    
+    // Reset form
     setPrescriptions([
       {
         itemId: '',
@@ -135,23 +117,16 @@ export const PrescribeMedicationModal: React.FC<PrescribeMedicationModalProps> =
         instructions: '',
       },
     ]);
+    
     setIsSubmitting(false);
-    handleClose();
+    onClose();
   };
 
-  if (!isMounted || !patient) return null;
+  if (!isOpen || !patient) return null;
 
   return (
-    <div
-      className={`fixed inset-0 bg-black bg-opacity-0 flex items-center justify-center p-4 z-50 transition-opacity duration-300 ${
-        isVisible ? 'opacity-100' : 'opacity-0'
-      }`}
-    >
-      <div
-        className={`bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto transition-all duration-300 transform ${
-          isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-        }`}
-      >
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-xl">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-blue-50 rounded-lg">
@@ -165,16 +140,15 @@ export const PrescribeMedicationModal: React.FC<PrescribeMedicationModalProps> =
             </div>
           </div>
           <button
-            onClick={handleClose}
+            onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
           >
             <X className="h-5 w-5 text-gray-500" />
           </button>
         </div>
 
-        {/* FORM */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Allergy warning */}
+          {/* Patient Allergies Warning */}
           {patient.allergies && patient.allergies !== 'None' && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <div className="flex items-center space-x-2">
@@ -184,7 +158,7 @@ export const PrescribeMedicationModal: React.FC<PrescribeMedicationModalProps> =
             </div>
           )}
 
-          {/* Search */}
+          {/* Medication Search */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Search Available Medications
@@ -201,7 +175,7 @@ export const PrescribeMedicationModal: React.FC<PrescribeMedicationModalProps> =
             </div>
           </div>
 
-          {/* Prescription List */}
+          {/* Prescriptions */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900">Prescriptions</h3>
@@ -259,6 +233,7 @@ export const PrescribeMedicationModal: React.FC<PrescribeMedicationModalProps> =
                       value={prescription.dosage}
                       onChange={(e) => updatePrescription(index, 'dosage', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g., 500mg"
                       required
                     />
                   </div>
@@ -315,9 +290,7 @@ export const PrescribeMedicationModal: React.FC<PrescribeMedicationModalProps> =
                       type="number"
                       min="1"
                       value={prescription.quantity}
-                      onChange={(e) =>
-                        updatePrescription(index, 'quantity', parseInt(e.target.value) || 1)
-                      }
+                      onChange={(e) => updatePrescription(index, 'quantity', parseInt(e.target.value) || 1)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                     />
@@ -330,10 +303,9 @@ export const PrescribeMedicationModal: React.FC<PrescribeMedicationModalProps> =
                     <input
                       type="text"
                       value={prescription.instructions}
-                      onChange={(e) =>
-                        updatePrescription(index, 'instructions', e.target.value)
-                      }
+                      onChange={(e) => updatePrescription(index, 'instructions', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g., Take with food"
                     />
                   </div>
                 </div>
@@ -341,11 +313,11 @@ export const PrescribeMedicationModal: React.FC<PrescribeMedicationModalProps> =
             ))}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-end space-x-4 border-t pt-6">
+          {/* Form Actions */}
+          <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
             <button
               type="button"
-              onClick={handleClose}
+              onClick={onClose}
               className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
             >
               Cancel
@@ -353,7 +325,7 @@ export const PrescribeMedicationModal: React.FC<PrescribeMedicationModalProps> =
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2 transition-colors duration-200"
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-2"
             >
               {isSubmitting ? (
                 <>

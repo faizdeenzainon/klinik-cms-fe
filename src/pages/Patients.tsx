@@ -1,8 +1,10 @@
 import React, { useState, useEffect  } from 'react';
 import { PatientTable } from '../components/Patients/PatientTable';
 import { PatientModal } from '../components/Patients/PatientModal';
+import { AddPatientModal } from '../components/Patients/AddPatientModal';
 import { Patient } from '../types';
 import { PrescribeMedicationModal } from '../components/Patients/PrescribeMedicationModal';
+import { ViewPatientModal } from '../components/Patients/ViewPatientModal';
 import axios from 'axios';
 
 export const Patients: React.FC = () => {
@@ -13,6 +15,7 @@ export const Patients: React.FC = () => {
   const [isViewOnly, setIsViewOnly] = useState<boolean>(false);
   const [isPrescribeModalOpen, setIsPrescribeModalOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
   useEffect(() => {
   axios.get<Patient[]>('http://localhost:8080/api/patients')
@@ -26,9 +29,7 @@ export const Patients: React.FC = () => {
 }, []);
 
   const handleEditPatient = (patient: Patient) => {
-    setPatientToEdit(patient);
-    setIsViewOnly(false);
-    setIsAddModalOpen(true);
+    // Implement edit functionality
   };
 
   const handleUpdatePatient = (updatedPatient: Patient) => {
@@ -37,12 +38,6 @@ export const Patients: React.FC = () => {
       prev.map(p => (p.id === updatedPatient.id ? updatedPatient : p))
     );
     setPatientToEdit(null);
-  };
-
-  const handleViewPatient = (patient: Patient) => {
-    setPatientToEdit(patient);
-    setIsViewOnly(true);
-    setIsAddModalOpen(true);
   };
 
   const handleDeletePatient = (patientId: string) => {
@@ -59,6 +54,11 @@ export const Patients: React.FC = () => {
     console.log('Prescriptions for', selectedPatient?.firstName, ':', prescriptions);
     // Here you would typically update the patient's medical records
     // and reduce inventory stock accordingly
+  };
+
+  const handleViewPatient = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setIsViewModalOpen(true);
   };
 
   const handleAddPatient = async (newPatientData: Omit<Patient, 'id' | 'createdAt'>) => {
@@ -86,7 +86,7 @@ export const Patients: React.FC = () => {
         onPrescribeMedication={handlePrescribeMedication}
       />
 
-      <PatientModal
+      {/* <PatientModal
         isOpen={isAddModalOpen}
         onClose={() => {
           setIsAddModalOpen(false);
@@ -97,6 +97,12 @@ export const Patients: React.FC = () => {
         onUpdatePatient={handleUpdatePatient}
         patientToEdit={patientToEdit || undefined}
         isViewOnly={isViewOnly}
+      /> */}
+
+      <AddPatientModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onAddPatient={handleAddPatient}
       />
 
       <PrescribeMedicationModal
@@ -104,6 +110,12 @@ export const Patients: React.FC = () => {
         onClose={() => setIsPrescribeModalOpen(false)}
         patient={selectedPatient}
         onPrescribe={handlePrescriptionSubmit}
+      />
+
+      <ViewPatientModal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        patient={selectedPatient}
       />
     </div>
   );

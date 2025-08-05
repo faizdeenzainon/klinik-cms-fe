@@ -91,3 +91,22 @@ export interface InventoryItem {
   lastUpdated: string;
   createdAt: string;
 }
+
+export interface Document {
+  id: string;
+  type: 'referral-letter' | 'medical-certificate' | 'prescription' | 'lab-report' | 'discharge-summary' | 'insurance-claim';
+  title: string;
+  patientId: string;
+  doctorId: string;
+  content: string;
+  templateId?: string;
+  status: 'draft' | 'completed' | 'sent' | 'archived';
+  createdAt: string;
+  updatedAt: string;
+  issuedDate?: string;
+  validUntil?: string;
+  recipientName?: string;
+  recipientAddress?: string;
+  attachments?: string[];
+  notes?: string;
+}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { X, User, Mail, Phone, Calendar, MapPin, Heart, AlertTriangle } from 'lucide-react';
 import { Patient } from '../../types';
 
@@ -6,18 +6,12 @@ interface AddPatientModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddPatient: (patient: Omit<Patient, 'id' | 'createdAt'>) => void;
-  patientToEdit?: Patient;
-  onUpdatePatient?: (updatedPatient: Patient) => void;
-  isViewOnly?: boolean;
 }
 
-export const PatientModal: React.FC<AddPatientModalProps> = ({
+export const AddPatientModal: React.FC<AddPatientModalProps> = ({
   isOpen,
   onClose,
   onAddPatient,
-  patientToEdit,
-  onUpdatePatient,
-  isViewOnly = false,
 }) => {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -32,58 +26,6 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
     bloodType: '',
     allergies: '',
   });
-
-  useEffect(() => {
-    if (patientToEdit) {
-      setFormData({
-        firstName: patientToEdit.firstName,
-        lastName: patientToEdit.lastName,
-        email: patientToEdit.email,
-        phone: patientToEdit.phone,
-        dateOfBirth: patientToEdit.dateOfBirth,
-        gender: patientToEdit.gender,
-        address: patientToEdit.address,
-        emergencyContact: patientToEdit.emergencyContact,
-        emergencyPhone: patientToEdit.emergencyPhone,
-        bloodType: patientToEdit.bloodType || '',
-        allergies: patientToEdit.allergies || '',
-      });
-    } else {
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        dateOfBirth: '',
-        gender: 'male',
-        address: '',
-        emergencyContact: '',
-        emergencyPhone: '',
-        bloodType: '',
-        allergies: '',
-      });
-    }
-  }, [patientToEdit, isOpen]);
-
-  useEffect(() => {
-    if (isOpen) {
-      setIsMounted(true);
-      // Delay to trigger fade-in
-      setTimeout(() => {
-        setIsVisible(true);
-      }, 10); // small delay for transition to apply
-    } else {
-      // trigger fade-out
-      setIsVisible(false);
-      // delay unmount
-      setTimeout(() => {
-        setIsMounted(false);
-      }, 300); // match transition
-    }
-  }, [isOpen]);
-
-  const [isVisible, setIsVisible] = useState(false); // for fade animation
-  const [isMounted, setIsMounted] = useState(false); // controls mounting
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -120,19 +62,27 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    if (patientToEdit && onUpdatePatient) {
-      const updatedPatient: Patient = {
-        ...patientToEdit,
-        ...formData,
-      };
-      onUpdatePatient(updatedPatient);
-    } else {
-      const newPatient: Omit<Patient, 'id' | 'createdAt'> = {
-        ...formData,
-        lastVisit: undefined,
-      };
-      onAddPatient(newPatient);
-    }
+    const newPatient: Omit<Patient, 'id' | 'createdAt'> = {
+      ...formData,
+      lastVisit: undefined,
+    };
+
+    onAddPatient(newPatient);
+    
+    // Reset form
+    setFormData({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      dateOfBirth: '',
+      gender: 'male',
+      address: '',
+      emergencyContact: '',
+      emergencyPhone: '',
+      bloodType: '',
+      allergies: '',
+    });
     
     setIsSubmitting(false);
     onClose();
@@ -145,36 +95,23 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
     }
   };
 
-  const handleClose = () => {
-    setIsVisible(false); // start fade out
-    setTimeout(() => {
-      onClose(); // trigger parent close after fade
-    }, 300);
-  };
-
-  if (!isMounted) return null;
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-xl">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-blue-50 rounded-lg">
               <User className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">
-                {isViewOnly ? 'View Patient' : patientToEdit ? 'Edit Patient' : 'Add New Patient'}
-              </h2>
-                {!isViewOnly && !patientToEdit && (
-                  <p className="text-sm text-gray-500">
-                    Enter patient information to create a new record
-                  </p>
-                )}
+              <h2 className="text-xl font-bold text-gray-900">Add New Patient</h2>
+              <p className="text-sm text-gray-500">Enter patient information to create a new record</p>
             </div>
           </div>
           <button
-            onClick={handleClose}
+            onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
           >
             <X className="h-5 w-5 text-gray-500" />
@@ -199,7 +136,7 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
                   onChange={(e) => handleInputChange('firstName', e.target.value)}
                   className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
                     errors.firstName ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                  } ${isViewOnly ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
+                  }`}
                   placeholder="Enter first name"
                 />
                 {errors.firstName && (
@@ -217,7 +154,7 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
                   onChange={(e) => handleInputChange('lastName', e.target.value)}
                   className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
                     errors.lastName ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                  } ${isViewOnly ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
+                  }`}
                   placeholder="Enter last name"
                 />
                 {errors.lastName && (
@@ -237,7 +174,7 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
                     onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
                     className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
                       errors.dateOfBirth ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                    } ${isViewOnly ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
+                    }`}
                   />
                 </div>
                 {errors.dateOfBirth && (
@@ -252,10 +189,7 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
                 <select
                   value={formData.gender}
                   onChange={(e) => handleInputChange('gender', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                    isViewOnly ? 'bg-gray-100 cursor-not-allowed text-gray-700' : 'bg-white'
-                  }`}
-                  disabled={isViewOnly}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 >
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -284,7 +218,7 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
                       errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                    } ${isViewOnly ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
+                    }`}
                     placeholder="Enter email address"
                   />
                 </div>
@@ -305,7 +239,7 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
                     onChange={(e) => handleInputChange('phone', e.target.value)}
                     className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
                       errors.phone ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                    } ${isViewOnly ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
+                    }`}
                     placeholder="Enter phone number"
                   />
                 </div>
@@ -326,7 +260,7 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
                     onChange={(e) => handleInputChange('address', e.target.value)}
                     className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none ${
                       errors.address ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                    } ${isViewOnly ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
+                    }`}
                     placeholder="Enter full address"
                   />
                 </div>
@@ -354,7 +288,7 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
                   onChange={(e) => handleInputChange('emergencyContact', e.target.value)}
                   className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
                     errors.emergencyContact ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                  } ${isViewOnly ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
+                  }`}
                   placeholder="Enter emergency contact name"
                 />
                 {errors.emergencyContact && (
@@ -374,7 +308,7 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
                     onChange={(e) => handleInputChange('emergencyPhone', e.target.value)}
                     className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
                       errors.emergencyPhone ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                    } ${isViewOnly ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
+                    }`}
                     placeholder="Enter emergency contact phone"
                   />
                 </div>
@@ -399,10 +333,7 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
                 <select
                   value={formData.bloodType}
                   onChange={(e) => handleInputChange('bloodType', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                    isViewOnly ? 'bg-gray-100 cursor-not-allowed text-gray-700' : 'bg-white'
-                  }`}
-                  disabled={isViewOnly}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 >
                   <option value="">Select blood type</option>
                   {bloodTypes.map(type => (
@@ -419,11 +350,8 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
                   type="text"
                   value={formData.allergies}
                   onChange={(e) => handleInputChange('allergies', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                    isViewOnly ? 'bg-gray-100 cursor-not-allowed text-gray-700' : 'border-gray-300'
-                  }`}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                   placeholder="Enter known allergies (or 'None')"
-                  readOnly={isViewOnly}
                 />
               </div>
             </div>
@@ -431,35 +359,27 @@ export const PatientModal: React.FC<AddPatientModalProps> = ({
 
           {/* Form Actions */}
           <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
-
             <button
               type="button"
-              onClick={handleClose}
+              onClick={onClose}
               className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
             >
-              Close
+              Cancel
             </button>
-
-            {!isViewOnly && (
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-2"
-              >
-                {isSubmitting ? (
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                  </svg>
-                ) : (
-                  <>
-                    <span>
-                      {patientToEdit ? 'Update Patient' : 'Add Patient'}
-                    </span>
-                  </>
-                )}
-              </button>
-            )}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Adding Patient...</span>
+                </>
+              ) : (
+                <span>Add Patient</span>
+              )}
+            </button>
           </div>
         </form>
       </div>

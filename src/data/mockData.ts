@@ -1,4 +1,4 @@
-import { Patient, Doctor, Appointment, MedicalRecord, DashboardStats, InventoryItem } from '../types';
+import { Patient, Doctor, Appointment, MedicalRecord, DashboardStats, InventoryItem, Document } from '../types';
 
 export const mockPatients: Patient[] = [
   {
@@ -295,5 +295,76 @@ export const mockInventoryItems: InventoryItem[] = [
     status: 'in-stock',
     lastUpdated: '2024-01-09',
     createdAt: '2023-08-18'
+  }
+];
+
+export const mockDocuments: Document[] = [
+  {
+    id: '1',
+    type: 'referral-letter',
+    title: 'Cardiology Referral for John Doe',
+    patientId: '1',
+    doctorId: '1',
+    content: 'Dear Dr. Smith,\n\nI am referring Mr. John Doe for cardiology consultation regarding his recent chest pain episodes and elevated blood pressure readings...',
+    status: 'completed',
+    createdAt: '2024-01-10',
+    updatedAt: '2024-01-10',
+    issuedDate: '2024-01-10',
+    recipientName: 'Dr. Robert Smith',
+    recipientAddress: 'Cardiology Department, City Hospital',
+    notes: 'Urgent referral - patient experiencing chest pain'
+  },
+  {
+    id: '2',
+    type: 'medical-certificate',
+    title: 'Medical Certificate - Sarah Wilson',
+    patientId: '2',
+    doctorId: '3',
+    content: 'This is to certify that Ms. Sarah Wilson was under my medical care from January 8, 2024, due to seasonal allergies...',
+    status: 'completed',
+    createdAt: '2024-01-08',
+    updatedAt: '2024-01-08',
+    issuedDate: '2024-01-08',
+    validUntil: '2024-01-15',
+    notes: 'Medical leave for 7 days'
+  },
+  {
+    id: '3',
+    type: 'prescription',
+    title: 'Prescription - Michael Johnson',
+    patientId: '3',
+    doctorId: '2',
+    content: 'Patient: Michael Johnson\nDate: January 5, 2024\n\nRx:\n1. Ibuprofen 400mg - Take twice daily with food\n2. Physical therapy sessions - 3 times per week',
+    status: 'completed',
+    createdAt: '2024-01-05',
+    updatedAt: '2024-01-05',
+    issuedDate: '2024-01-05',
+    notes: 'For knee pain management'
+  },
+  {
+    id: '4',
+    type: 'lab-report',
+    title: 'Blood Test Results - John Doe',
+    patientId: '1',
+    doctorId: '1',
+    content: 'Laboratory Report\nPatient: John Doe\nTest Date: January 12, 2024\n\nComplete Blood Count:\n- Hemoglobin: 14.2 g/dL (Normal)\n- White Blood Cells: 7,200/μL (Normal)',
+    status: 'completed',
+    createdAt: '2024-01-12',
+    updatedAt: '2024-01-12',
+    issuedDate: '2024-01-12',
+    notes: 'Follow-up blood work'
+  },
+  {
+    id: '5',
+    type: 'insurance-claim',
+    title: 'Insurance Claim - Sarah Wilson',
+    patientId: '2',
+    doctorId: '3',
+    content: 'Insurance Claim Form\nPatient: Sarah Wilson\nPolicy Number: INS-2024-001\nTreatment: Pediatric consultation and allergy treatment',
+    status: 'sent',
+    createdAt: '2024-01-08',
+    updatedAt: '2024-01-09',
+    issuedDate: '2024-01-08',
+    notes: 'Submitted to insurance company'
   }
 ];
