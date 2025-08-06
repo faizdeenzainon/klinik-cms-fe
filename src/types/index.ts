@@ -110,3 +110,23 @@ export interface Document {
   attachments?: string[];
   notes?: string;
 }
+
+export interface Visit {
+  id: string;
+  patientId: string;
+  doctorId: string;
+  queueNumber: number;
+  complaint: string;
+  timeIn: string;
+  status: 'waiting' | 'in-consultation' | 'completed' | 'cancelled';
+  diagnosis?: string;
+  medications?: string[];
+  notes?: string;
+  timeOut?: string;
+}
+
+export interface QueueStats {
+  totalWaiting: number;
+  averageWaitTime: number;
+  completedToday: number;
+}

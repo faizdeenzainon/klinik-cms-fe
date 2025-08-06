@@ -6,6 +6,7 @@ import { LoginForm } from './components/Auth/LoginForm';
 import { Dashboard } from './pages/Dashboard';
 import { Patients } from './pages/Patients';
 import { Appointments } from './pages/Appointments';
+import { Queue } from './pages/Queue';
 import { Doctors } from './pages/Doctors';
 import { MedicalRecords } from './pages/MedicalRecords';
 import { Inventory } from './pages/Inventory';
@@ -37,6 +38,7 @@ const AppContent: React.FC = () => {
         <Route path="/" element={<Dashboard />} />
         <Route path="/patients" element={<Patients />} />
         <Route path="/appointments" element={<Appointments />} />
+        <Route path="/queue" element={<Queue />} />
         <Route path="/doctors" element={<Doctors />} />
         <Route path="/records" element={<MedicalRecords />} />
         <Route path="/inventory" element={<Inventory />} />

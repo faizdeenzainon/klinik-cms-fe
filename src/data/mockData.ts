@@ -1,4 +1,4 @@
-import { Patient, Doctor, Appointment, MedicalRecord, DashboardStats, InventoryItem, Document } from '../types';
+import { Patient, Doctor, Appointment, MedicalRecord, DashboardStats, InventoryItem, Document, Visit, QueueStats } from '../types';
 
 export const mockPatients: Patient[] = [
   {
@@ -368,3 +368,39 @@ export const mockDocuments: Document[] = [
     notes: 'Submitted to insurance company'
   }
 ];
+
+export const mockVisits: Visit[] = [
+  {
+    id: '1',
+    patientId: '1',
+    doctorId: '1',
+    queueNumber: 1,
+    complaint: 'Chest pain and shortness of breath',
+    timeIn: '2024-01-15T09:30:00',
+    status: 'waiting'
+  },
+  {
+    id: '2',
+    patientId: '2',
+    doctorId: '3',
+    queueNumber: 2,
+    complaint: 'Fever and cough for 3 days',
+    timeIn: '2024-01-15T10:15:00',
+    status: 'in-consultation'
+  },
+  {
+    id: '3',
+    patientId: '3',
+    doctorId: '2',
+    queueNumber: 3,
+    complaint: 'Knee pain after sports injury',
+    timeIn: '2024-01-15T10:45:00',
+    status: 'waiting'
+  }
+];
+
+export const queueStats: QueueStats = {
+  totalWaiting: 3,
+  averageWaitTime: 25,
+  completedToday: 12
+};

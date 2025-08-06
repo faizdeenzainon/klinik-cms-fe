@@ -7,6 +7,8 @@ import {
   FileText,
   Package,
   Settings,
+  Clock,
+  CreditCard,
   X,
 } from 'lucide-react';
 
@@ -20,10 +22,11 @@ const navigation = [
   { name: 'Patients', href: '/patients', icon: Users },
   // { name: 'Appointments', href: '/appointments', icon: Calendar },
   { name: 'Doctors', href: '/doctors', icon: UserCheck },
+  { name: 'Queue', href: '/queue', icon: Clock },
   { name: 'Medical Records', href: '/records', icon: FileText },
   { name: 'Inventory', href: '/inventory', icon: Package },
   { name: 'Documentation', href: '/documentation', icon: FileText },
-  // { name: 'Billing', href: '/billing', icon: CreditCard },
+  { name: 'Billing', href: '/billing', icon: CreditCard },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
