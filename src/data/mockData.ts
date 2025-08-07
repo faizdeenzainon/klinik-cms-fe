@@ -1,4 +1,4 @@
-import { Patient, Doctor, Appointment, MedicalRecord, DashboardStats, InventoryItem, Document, Visit, QueueStats } from '../types';
+import { Patient, Doctor, Appointment, MedicalRecord, DashboardStats, InventoryItem, Document, Visit, QueueStats, Prescription } from '../types';
 
 export const mockPatients: Patient[] = [
   {
@@ -404,3 +404,41 @@ export const queueStats: QueueStats = {
   averageWaitTime: 25,
   completedToday: 12
 };
+
+export const mockMedicines = [
+  { id: '1', name: 'Panadol', strength: '500mg', type: 'tablet' },
+  { id: '2', name: 'Amoxil', strength: '250mg', type: 'capsule' },
+  { id: '3', name: 'Zyrtec', strength: '10mg', type: 'tablet' },
+  { id: '4', name: 'Ventolin', strength: '100mcg', type: 'inhaler' },
+  { id: '5', name: 'Augmentin', strength: '625mg', type: 'tablet' },
+  { id: '6', name: 'Cetirizine', strength: '10mg', type: 'tablet' },
+  { id: '7', name: 'Loratadine', strength: '10mg', type: 'tablet' },
+  { id: '8', name: 'Ibuprofen', strength: '400mg', type: 'tablet' },
+];
+
+export const mockPrescriptions: Prescription[] = [
+  {
+    id: '1',
+    visitId: '1',
+    medicineId: '1',
+    medicineName: 'Panadol',
+    dosage: '500mg',
+    quantity: 20,
+    frequency: '2x daily',
+    duration: '5 days',
+    instructions: 'Take after meals',
+    confirmed: false
+  },
+  {
+    id: '2',
+    visitId: '1',
+    medicineId: '6',
+    medicineName: 'Cetirizine',
+    dosage: '10mg',
+    quantity: 3,
+    frequency: 'once at night',
+    duration: '3 days',
+    instructions: 'Take before bedtime',
+    confirmed: false
+  }
+];

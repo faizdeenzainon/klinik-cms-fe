@@ -1,21 +1,30 @@
 import React from 'react';
-import { Mail, Phone, Clock, Award } from 'lucide-react';
+import { Mail, Phone, Clock, Award, Eye, Edit, Trash2 } from 'lucide-react';
 import { Doctor } from '../../types';
 
 interface DoctorGridProps {
   doctors: Doctor[];
   onAddDoctor: () => void;
+  onEditDoctor: (doctor: Doctor) => void;
+  onViewDoctor: (doctor: Doctor) => void;
+  onDeleteDoctor: (doctorId: string) => void;
 }
 
-export const DoctorGrid: React.FC<DoctorGridProps> = ({ doctors, onAddDoctor }) => {
+export const DoctorGrid: React.FC<DoctorGridProps> = ({ 
+  doctors, 
+  onAddDoctor, 
+  onEditDoctor, 
+  onViewDoctor, 
+  onDeleteDoctor 
+}) => {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900">Medical Staff</h3>
           <button 
-            onClick={onAddDoctor}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200">
+          onClick={() => onAddDoctor()}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200">
             Add Doctor
           </button>
         </div>
@@ -60,12 +69,27 @@ export const DoctorGrid: React.FC<DoctorGridProps> = ({ doctors, onAddDoctor }) 
                 </div>
               </div>
               
-              <div className="mt-4 flex space-x-2">
-                <button className="flex-1 bg-blue-50 text-blue-600 py-2 px-3 rounded-lg hover:bg-blue-100 transition-colors duration-200 text-sm font-medium">
-                  View Schedule
+              <div className="mt-4 flex justify-center space-x-2">
+                <button
+                  onClick={() => onViewDoctor(doctor)}
+                  className="text-blue-600 hover:text-blue-900 p-2 rounded hover:bg-blue-50 transition-colors duration-200"
+                  title="View Doctor"
+                >
+                  <Eye className="h-4 w-4" />
                 </button>
-                <button className="flex-1 bg-gray-50 text-gray-600 py-2 px-3 rounded-lg hover:bg-gray-100 transition-colors duration-200 text-sm font-medium">
-                  Edit Profile
+                <button
+                  onClick={() => onEditDoctor(doctor)}
+                  className="text-green-600 hover:text-green-900 p-2 rounded hover:bg-green-50 transition-colors duration-200"
+                  title="Edit Doctor"
+                >
+                  <Edit className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => onDeleteDoctor(doctor.id)}
+                  className="text-red-600 hover:text-red-900 p-2 rounded hover:bg-red-50 transition-colors duration-200"
+                  title="Delete Doctor"
+                >
+                  <Trash2 className="h-4 w-4" />
                 </button>
               </div>
             </div>

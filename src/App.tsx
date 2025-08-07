@@ -12,6 +12,7 @@ import { MedicalRecords } from './pages/MedicalRecords';
 import { Inventory } from './pages/Inventory';
 import { Documentation } from './pages/Documentation';
 import { Billing } from './pages/Billing';
+import { Pharmacy } from './pages/Pharmacy';
 import { Settings } from './pages/Settings';
 
 const AppContent: React.FC = () => {
@@ -44,6 +45,9 @@ const AppContent: React.FC = () => {
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/documentation" element={<Documentation />} />
         <Route path="/billing" element={<Billing />} />
+        <Route path="/billing/:visitId" element={<Billing />} />
+        <Route path="/pharmacy" element={<Pharmacy />} />
+        <Route path="/pharmacy/:visitId" element={<Pharmacy />} />
         <Route path="/settings" element={<Settings />} />
       </Routes>
     </Layout>

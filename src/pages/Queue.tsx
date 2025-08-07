@@ -46,7 +46,7 @@ export const Queue: React.FC = () => {
     );
   };
 
-  const handleEndConsultation = (visitId: string, diagnosis: string, medications: string[], notes: string) => {
+  const handleEndConsultation = (visitId: string, diagnosis: string, medications: string[], notes: string, paymentType: 'cash' | 'panel', panelName?: string) => {
     setVisits(prev => 
       prev.map(visit => 
         visit.id === visitId 
@@ -56,17 +56,12 @@ export const Queue: React.FC = () => {
               diagnosis,
               medications,
               notes,
-              timeOut: new Date().toISOString()
+              timeOut: new Date().toISOString(),
+              paymentType,
+              panelName,
+              billingStatus: paymentType === 'panel' ? 'to-be-claimed' as const : 'pending' as const
             }
           : visit
-      )
-    );
-  };
-
-  const handleCancelConsultation = (visitId: string) => {
-    setVisits(prev =>
-      prev.map(visit =>
-        visit.id === visitId ? { ...visit, status: 'waiting' } : visit
       )
     );
   };
@@ -114,7 +109,6 @@ export const Queue: React.FC = () => {
           currentDoctorId={currentDoctorId}
           onStartConsultation={handleStartConsultation}
           onEndConsultation={handleEndConsultation}
-          onCancelConsultation={handleCancelConsultation}
         />
       )}
     </div>

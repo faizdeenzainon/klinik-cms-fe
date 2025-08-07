@@ -17,6 +17,9 @@ export const Inventory: React.FC = () => {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
 
+  const [sortKey, setSortKey] = useState<keyof InventoryItem | ''>('');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+
   const filteredItems = items.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -26,6 +29,24 @@ export const Inventory: React.FC = () => {
     
     return matchesSearch && matchesCategory && matchesStatus;
   });
+
+  const sortedItems = [...filteredItems].sort((a, b) => {
+  if (!sortKey) return 0;
+  const aValue = a[sortKey];
+  const bValue = b[sortKey];
+
+  if (typeof aValue === 'number' && typeof bValue === 'number') {
+    return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+  }
+
+  if (typeof aValue === 'string' && typeof bValue === 'string') {
+    return sortOrder === 'asc'
+      ? aValue.localeCompare(bValue)
+      : bValue.localeCompare(aValue);
+  }
+
+  return 0;
+});
 
   const totalItems = items.length;
   const lowStockItems = items.filter(item => item.status === 'low-stock').length;
@@ -109,6 +130,15 @@ export const Inventory: React.FC = () => {
         return 'bg-orange-100 text-orange-800';
       default:
         return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const toggleSort = (key: keyof InventoryItem) => {
+    if (sortKey === key) {
+      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortKey(key);
+      setSortOrder('asc');
     }
   };
 
@@ -223,12 +253,12 @@ export const Inventory: React.FC = () => {
                   <option value="expired">Expired</option>
                 </select>
               </div>
-              <button 
+              {/* <button 
                 onClick={() => setAddModalOpen(true)}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center space-x-2 w-full sm:w-auto justify-center">
                 <Plus className="h-4 w-4" />
                 <span>Add Item</span>
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
@@ -237,19 +267,34 @@ export const Inventory: React.FC = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  onClick={() => toggleSort('name')}
+                  className="cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                >
                   Item Details
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  onClick={() => toggleSort('category')}
+                  className="cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                >
                   Category
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  onClick={() => toggleSort('currentStock')}
+                  className="cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                >
                   Stock Level
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  onClick={() => toggleSort('unitPrice')}
+                  className="cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                >
                   Unit Price
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  onClick={() => toggleSort('status')}
+                  className="cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                >
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -261,7 +306,7 @@ export const Inventory: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredItems.map((item) => (
+              {sortedItems.map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50 transition-colors duration-200">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>

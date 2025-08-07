@@ -9,6 +9,7 @@ import {
   Settings,
   Clock,
   CreditCard,
+  Pill,
   X,
 } from 'lucide-react';
 
@@ -26,6 +27,7 @@ const navigation = [
   { name: 'Medical Records', href: '/records', icon: FileText },
   { name: 'Inventory', href: '/inventory', icon: Package },
   { name: 'Documentation', href: '/documentation', icon: FileText },
+  { name: 'Pharmacy', href: '/pharmacy', icon: Pill },
   { name: 'Billing', href: '/billing', icon: CreditCard },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];

@@ -123,6 +123,24 @@ export interface Visit {
   medications?: string[];
   notes?: string;
   timeOut?: string;
+  paymentType?: 'cash' | 'panel';
+  panelName?: string;
+  billingStatus?: 'pending' | 'to-be-claimed' | 'paid';
+}
+
+export interface Prescription {
+  id: string;
+  visitId: string;
+  medicineId: string;
+  medicineName: string;
+  dosage: string;
+  quantity: number;
+  frequency: string;
+  duration: string;
+  instructions?: string;
+  confirmed: boolean;
+  pharmacistId?: string;
+  confirmedAt?: string;
 }
 
 export interface QueueStats {

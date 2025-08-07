@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
-import { User, Clock, Stethoscope, FileText, Pill, Save, X } from 'lucide-react';
+import { User, Clock, Stethoscope, FileText, Pill, Save, X, Search } from 'lucide-react';
 import { Patient, Doctor, Visit } from '../../types';
-import { mockPatients, mockDoctors } from '../../data/mockData';
+import { mockPatients, mockDoctors, mockMedicines } from '../../data/mockData';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 interface DoctorPanelProps {
   visits: Visit[];
   currentDoctorId: string;
   onStartConsultation: (visitId: string) => void;
-  onEndConsultation: (visitId: string, diagnosis: string, medications: string[], notes: string) => void;
-  onCancelConsultation: (visitId: string) => void; 
+  onEndConsultation: (visitId: string, diagnosis: string, medications: string[], notes: string, paymentType: 'cash' | 'panel', panelName?: string) => void;
 }
 
 interface ConsultationData {
   diagnosis: string;
   medications: string[];
   notes: string;
+  paymentType: 'cash' | 'panel';
+  panelName: string;
 }
 
 export const DoctorPanel: React.FC<DoctorPanelProps> = ({
@@ -23,14 +25,17 @@ export const DoctorPanel: React.FC<DoctorPanelProps> = ({
   currentDoctorId,
   onStartConsultation,
   onEndConsultation,
-  onCancelConsultation,
 }) => {
+  const navigate = useNavigate();
   const [consultingVisit, setConsultingVisit] = useState<Visit | null>(null);
   const [consultationData, setConsultationData] = useState<ConsultationData>({
     diagnosis: '',
     medications: [],
     notes: '',
+    paymentType: 'cash',
+    panelName: '',
   });
+  const [medicineSearch, setMedicineSearch] = useState('');
   const [newMedication, setNewMedication] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -38,6 +43,10 @@ export const DoctorPanel: React.FC<DoctorPanelProps> = ({
   const doctorVisits = visits.filter(visit => visit.doctorId === currentDoctorId);
   const waitingVisits = doctorVisits.filter(visit => visit.status === 'waiting');
   const inConsultationVisit = doctorVisits.find(visit => visit.status === 'in-consultation');
+  
+  const filteredMedicines = mockMedicines.filter(medicine =>
+    medicine.name.toLowerCase().includes(medicineSearch.toLowerCase())
+  );
 
   const getPatientName = (patientId: string) => {
     const patient = mockPatients.find(p => p.id === patientId);
@@ -60,6 +69,8 @@ export const DoctorPanel: React.FC<DoctorPanelProps> = ({
       diagnosis: visit.diagnosis || '',
       medications: visit.medications || [],
       notes: visit.notes || '',
+      paymentType: visit.paymentType || 'cash',
+      panelName: visit.panelName || '',
     });
     onStartConsultation(visit.id);
   };
@@ -81,8 +92,14 @@ export const DoctorPanel: React.FC<DoctorPanelProps> = ({
     }));
   };
 
+  const handleAddMedicineFromSearch = (medicine: any) => {
+    const medicineText = `${medicine.name} ${medicine.strength}`;
+    handleAddMedication();
+    setNewMedication(medicineText);
+  };
+
   const handleEndConsultation = async () => {
-    if (!consultingVisit || !consultationData.diagnosis.trim()) return;
+    if (!consultingVisit || !consultationData.diagnosis.trim() || (consultationData.paymentType === 'panel' && !consultationData.panelName.trim())) return;
 
     setIsSubmitting(true);
     
@@ -93,8 +110,21 @@ export const DoctorPanel: React.FC<DoctorPanelProps> = ({
       consultingVisit.id,
       consultationData.diagnosis,
       consultationData.medications,
-      consultationData.notes
+      consultationData.notes,
+      consultationData.paymentType,
+      consultationData.panelName
     );
+
+    // Handle post-consultation logic
+    if (consultationData.paymentType === 'cash') {
+      // Show toast and redirect to pharmacy
+      // alert('Consultation ended. Redirected to pharmacy.');
+      // navigate(`/pharmacy/${consultingVisit.id}`);
+      alert('Consultation ended. Patient is now waiting at pharmacy.');
+    } else {
+      // Panel case - show toast and stay on page
+      alert(`Panel case marked as to be claimed for ${consultationData.panelName}.`);
+    }
 
     // Reset state
     setConsultingVisit(null);
@@ -102,19 +132,20 @@ export const DoctorPanel: React.FC<DoctorPanelProps> = ({
       diagnosis: '',
       medications: [],
       notes: '',
+      paymentType: 'cash',
+      panelName: '',
     });
     setIsSubmitting(false);
   };
 
   const handleCloseConsultation = () => {
-    if (consultingVisit) {
-      onCancelConsultation(consultingVisit.id);
-    }
     setConsultingVisit(null);
     setConsultationData({
       diagnosis: '',
       medications: [],
       notes: '',
+      paymentType: 'cash',
+      panelName: '',
     });
   };
 
@@ -328,6 +359,40 @@ export const DoctorPanel: React.FC<DoctorPanelProps> = ({
               {/* Medications */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                  <Search className="h-4 w-4 mr-2" />
+                  Search Medicines
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={medicineSearch}
+                    onChange={(e) => setMedicineSearch(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Search medicines..."
+                  />
+                  {medicineSearch && filteredMedicines.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                      {filteredMedicines.map((medicine) => (
+                        <button
+                          key={medicine.id}
+                          type="button"
+                          onClick={() => {
+                            setNewMedication(`${medicine.name} ${medicine.strength}`);
+                            setMedicineSearch('');
+                          }}
+                          className="w-full text-left px-3 py-2 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                        >
+                          <div className="font-medium text-gray-900">{medicine.name}</div>
+                          <div className="text-sm text-gray-500">{medicine.strength} - {medicine.type}</div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
                   <Pill className="h-4 w-4 mr-2" />
                   Medications
                 </label>
@@ -383,6 +448,37 @@ export const DoctorPanel: React.FC<DoctorPanelProps> = ({
                 />
               </div>
 
+              {/* Payment Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Payment Type *
+                </label>
+                <select
+                  value={consultationData.paymentType}
+                  onChange={(e) => setConsultationData(prev => ({ ...prev, paymentType: e.target.value as 'cash' | 'panel' }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="cash">Cash</option>
+                  <option value="panel">Panel</option>
+                </select>
+              </div>
+
+              {consultationData.paymentType === 'panel' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Panel Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={consultationData.panelName}
+                    onChange={(e) => setConsultationData(prev => ({ ...prev, panelName: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter panel name (e.g., Great Eastern)"
+                    required
+                  />
+                </div>
+              )}
+
               {/* Actions */}
               <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
                 <button
@@ -394,7 +490,7 @@ export const DoctorPanel: React.FC<DoctorPanelProps> = ({
                 </button>
                 <button
                   onClick={handleEndConsultation}
-                  disabled={!consultationData.diagnosis.trim() || isSubmitting}
+                  disabled={!consultationData.diagnosis.trim() || (consultationData.paymentType === 'panel' && !consultationData.panelName.trim()) || isSubmitting}
                   className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-2"
                 >
                   {isSubmitting ? (

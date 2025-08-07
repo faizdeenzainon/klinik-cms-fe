@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { CreditCard, DollarSign, Clock, CheckCircle, AlertCircle, Filter } from 'lucide-react';
+import { CreditCard, DollarSign, Clock, CheckCircle, AlertCircle, Filter, User, FileText } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { mockPatients, mockVisits, mockPrescriptions } from '../data/mockData';
 
 interface BillingRecord {
   id: string;
@@ -63,8 +65,149 @@ const mockBillingData: BillingRecord[] = [
 ];
 
 export const Billing: React.FC = () => {
+  const { visitId } = useParams<{ visitId: string }>();
+  const navigate = useNavigate();
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'paid' | 'pending' | 'overdue'>('all');
   
+  // If visitId is provided, show visit-specific billing
+  if (visitId) {
+    const visit = mockVisits.find(v => v.id === visitId);
+    const patient = visit ? mockPatients.find(p => p.id === visit.patientId) : null;
+    const prescriptions = mockPrescriptions.filter(p => p.visitId === visitId);
+    
+    if (!visit || !patient) {
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-red-600 text-lg">Visit or patient not found</p>
+            <button 
+              onClick={() => navigate('/billing')}
+              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            >
+              Back to Billing
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    const consultationFee = 50;
+    const medicationTotal = prescriptions.reduce((total, p) => total + (p.quantity * 2), 0); // $2 per unit
+    const totalAmount = consultationFee + medicationTotal;
+
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-4xl mx-auto space-y-6">
+          {/* Header */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+                  <CreditCard className="h-6 w-6 mr-2 text-blue-600" />
+                  Billing - Payment Processing
+                </h1>
+                <p className="text-gray-600 mt-1">Process payment for consultation and medications</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-500">Visit ID</p>
+                <p className="text-lg font-semibold text-gray-900">#{visitId}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Patient Information */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <User className="h-5 w-5 mr-2 text-blue-600" />
+              Patient Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <p className="text-sm text-gray-600">Patient Name</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {patient.firstName} {patient.lastName}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Payment Type</p>
+                <p className="text-lg font-semibold text-gray-900 capitalize">
+                  {visit.paymentType || 'Cash'}
+                  {visit.panelName && ` - ${visit.panelName}`}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Status</p>
+                <span className={`px-2 py-1 text-sm font-medium rounded-full ${
+                  visit.billingStatus === 'paid' ? 'bg-green-100 text-green-800' :
+                  visit.billingStatus === 'to-be-claimed' ? 'bg-orange-100 text-orange-800' :
+                  'bg-yellow-100 text-yellow-800'
+                }`}>
+                  {visit.billingStatus?.replace('-', ' ') || 'Pending'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Billing Details */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <FileText className="h-5 w-5 mr-2 text-blue-600" />
+              Billing Details
+            </h3>
+            
+            <div className="space-y-4">
+              <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                <span className="text-gray-700">Consultation Fee</span>
+                <span className="font-semibold">${consultationFee}</span>
+              </div>
+              
+              {prescriptions.map((prescription, index) => (
+                <div key={prescription.id} className="flex justify-between items-center py-2 border-b border-gray-200">
+                  <span className="text-gray-700">
+                    {prescription.medicineName} ({prescription.quantity} units)
+                  </span>
+                  <span className="font-semibold">${prescription.quantity * 2}</span>
+                </div>
+              ))}
+              
+              <div className="flex justify-between items-center py-3 border-t-2 border-gray-300 text-lg font-bold">
+                <span>Total Amount</span>
+                <span className="text-green-600">${totalAmount}</span>
+              </div>
+            </div>
+            
+            <div className="mt-6 flex justify-between">
+              <button
+                onClick={() => navigate('/pharmacy/' + visitId)}
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              >
+                Back to Pharmacy
+              </button>
+              
+              <div className="space-x-3">
+                {visit.paymentType === 'panel' ? (
+                  <button className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700">
+                    Submit to Panel
+                  </button>
+                ) : (
+                  <>
+                    <button className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                      Process Cash Payment
+                    </button>
+                    <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                      Process Card Payment
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Regular billing page
   const filteredBilling = selectedFilter === 'all' 
     ? mockBillingData 
     : mockBillingData.filter(record => record.status === selectedFilter);
